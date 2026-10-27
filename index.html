@@ -1,0 +1,817 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Search Your Meal </title>
+    <link rel="stylesheet" href="bootstrap.min.css"/>
+    <style>
+        body{
+            min-width: 0;
+            overflow-x: hidden;
+            background: linear-gradient(135deg, #fef4d6 0%, #f1f3f8 52%, #ece9f4 100%);
+            color: #273248;
+            font-family: "Segoe UI", Tahoma, sans-serif;
+        }
+        .page-container{
+            max-width: 1180px;
+        }
+        .hero{
+         position: relative;
+            overflow: hidden;
+            padding: 3rem 2rem;
+            border: 0;
+            border-radius: 24px;
+            background: linear-gradient(120deg, #202a44, #414f82 52%, #75638f);
+            color: #fff;
+            box-shadow: 0 16px 35px rgba(45, 56, 103, 0.24);
+            transition: transform 0.3s ease, box-shadow 0.3s ease, background 0.3s ease;
+        }
+        .hero:hover{
+            background: linear-gradient(120deg, #172038, #35436f 52%, #624f7b);
+            transform: translateY(-3px);
+            box-shadow: 0 20px 40px rgba(45, 56, 103, 0.32);
+        }
+        .hero::before,
+        .hero::after{
+            position: absolute;
+            content: "";
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.13);
+        }
+        .hero::before{
+            width: 210px;
+            height: 210px;
+            top: -100px;
+            right: 7%;
+        }
+        .hero::after{
+            width: 130px;
+            height: 130px;
+            bottom: -65px;
+            left: 8%;
+        }
+        .hero-content{
+            position: relative;
+            z-index: 1;
+            max-width: 680px;
+            margin: 0 auto;
+        }
+        .hero-icon{
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 64px;
+            height: 64px;
+            margin-bottom: 1rem;
+            border-radius: 20px;
+            background: rgba(255, 255, 255, 0.18);
+            font-size: 2rem;
+            transition: transform 0.3s ease, background 0.3s ease;
+        }
+        .hero:hover .hero-icon{
+            background: rgba(255, 255, 255, 0.28);
+            transform: rotate(-6deg) scale(1.08);
+        }
+        .hero h1{
+            font-size: clamp(2rem, 5vw, 3.25rem);
+            font-weight: 700;
+            letter-spacing: -1px;
+        }
+        .hero p{
+            margin-bottom: 0;
+            color: rgba(255, 255, 255, 0.88);
+            font-size: 1.08rem;
+        }
+        .search-panel{
+            padding: 1rem;
+            margin: -1.6rem auto 1.75rem;
+            position: relative;
+            z-index: 2;
+            max-width: 850px;
+            border-radius: 16px;
+            background: #fff;
+            box-shadow: 0 10px 28px rgba(41, 50, 65, 0.12);
+            transition: transform 0.25s ease, box-shadow 0.25s ease;
+        }
+        .search-panel:hover,
+        .search-panel:focus-within{
+            transform: translateY(-4px);
+            box-shadow: 0 16px 34px rgba(22, 78, 99, 0.2);
+        }
+        .search-panel .form-control{
+            height: 48px;
+            border-color: #d3d8e6;
+            border-radius: 10px;
+            box-shadow: 0 2px 6px rgba(38, 59, 64, 0.05);
+            transition: border-color 0.2s ease, box-shadow 0.2s ease;
+        }
+        .search-panel .form-control:hover,
+        .search-panel .form-control:focus{
+            border-color: #d97706;
+            box-shadow: 0 0 0 3px rgba(217, 119, 6, 0.16), 0 5px 12px rgba(39, 50, 72, 0.1);
+            outline: none;
+        }
+        .search-panel .btn{
+            height: 48px;
+            border: 0;
+            border-radius: 10px;
+            background: #d97706;
+        }
+        .search-panel .btn:hover,
+        .search-panel .btn:focus{
+            background: #b45309;
+        }
+        #message{
+            color: #b45309;
+            font-weight: 600;
+        }
+        .meal-image{
+            height: 210px;
+            object-fit: cover;
+        }
+        .meal-card{
+            position: relative;
+            height: 100%;
+            overflow: hidden;
+            border: 0;
+            border-radius: 16px;
+            background: rgba(255, 255, 255, 0.94);
+            cursor: pointer;
+            box-shadow: 0 7px 22px rgba(41, 50, 65, 0.09);
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+        .meal-card:hover,
+        .meal-card:focus{
+            transform: translateY(-7px);
+            box-shadow: 0 16px 28px rgba(22, 78, 99, 0.2);
+            outline: none;
+        }
+        .meal-card .card-body{
+            padding: 1.25rem;
+        }
+        .meal-card .card-title{
+            color: #303d70;
+            font-weight: 700;
+        }
+        .meal-card .card-text{
+            color: #6b7280;
+            margin-bottom: 0.45rem;
+        }
+        .meal-card .card-text::first-letter{
+            text-transform: uppercase;
+        }
+        .meal-type-badge{
+            position: absolute;
+            top: 12px;
+            right: 12px;
+            padding: 5px 9px;
+            border-radius: 20px;
+            color: #fff;
+            font-size: 0.72rem;
+            font-weight: 700;
+            letter-spacing: 0.4px;
+            box-shadow: 0 3px 8px rgba(0, 0, 0, 0.2);
+        }
+        .meal-type-badge.veg{
+            background: #3f8068;
+        }
+        .meal-type-badge.non-veg{
+            background: #b4533f;
+        }
+        .recipe-instructions{
+            white-space: pre-line;
+        }
+        .video-preview{
+            width: 100%;
+            height: 315px;
+            border-radius: 12px;
+            border: 0;
+            background: #eee8f5;
+        }
+        .video-fallback{
+            display: none;
+            padding: 1.5rem;
+            border-radius: 12px;
+            background: #f5f0e8;
+            color: #65596a;
+            text-align: center;
+        }
+        .video-fallback img{
+            display: block;
+            width: min(100%, 480px);
+            margin: 0 auto 1rem;
+            border-radius: 10px;
+        }
+        #mealDetails{
+            border: 0;
+            border-radius: 20px;
+            box-shadow: 0 12px 30px rgba(41, 50, 65, 0.1);
+        }
+        #mealDetails .card-body{
+            padding: clamp(1.25rem, 4vw, 2.5rem);
+        }
+        #detailTitle{
+            text-align: center;
+            color: #303d70;
+            font-weight: 700;
+        }
+        #detailMeta{
+            text-align: center;
+        }
+        #detailImage{
+            display: block;
+            width: min(100%, 560px);
+            max-height: 390px;
+            object-fit: cover;
+            margin: 0 auto 1rem;
+            box-shadow: 0 8px 20px rgba(41, 50, 65, 0.15);
+        }
+        #detailIngredients{
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
+            gap: 0.6rem 1.5rem;
+            padding-left: 1.25rem;
+            color: #596273;
+        }
+        #detailInstructions{
+            color: #596273;
+            line-height: 1.8;
+        }
+        #videoSection h4,
+        #mealDetails h4{
+            margin-top: 1.5rem;
+            color: #303d70;
+            font-weight: 700;
+        }
+        #backButton{
+            border: 0;
+            border-radius: 9px;
+            background: #d97706;
+        }
+        #backButton:hover,
+        #backButton:focus{
+            background: #b45309;
+        }
+        .creator-badge{
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 44px;
+            height: 44px;
+            border: 1px solid rgba(255, 255, 255, 0.55);
+            border-radius: 50%;
+            background: #303d70;
+            color: #fff;
+            text-decoration: none;
+            box-shadow: 0 6px 16px rgba(22, 78, 99, 0.3);
+            transition: transform 0.2s ease, box-shadow 0.2s ease, background 0.2s ease;
+        }
+        .creator-badge:hover,
+        .creator-badge:focus{
+            color: #fff;
+            text-decoration: none;
+            background: #d97706;
+            transform: translateY(-3px) scale(1.08);
+            box-shadow: 0 10px 22px rgba(22, 78, 99, 0.38);
+            outline: none;
+        }
+        .creator-logo{
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 30px;
+            height: 30px;
+            border-radius: 9px;
+            background: #eef0f7;
+            color: #303d70;
+            font-weight: bold;
+            font-size: 0.85rem;
+            letter-spacing: 0.5px;
+            transition: transform 0.2s ease;
+        }
+        .creator-badge:hover .creator-logo,
+        .creator-badge:focus .creator-logo{
+            color: #b45309;
+            transform: rotate(-8deg);
+        }
+        .creator-footer{
+            position: fixed;
+            right: 24px;
+            bottom: 20px;
+            z-index: 1000;
+            margin: 0;
+        }
+        body{
+            background: linear-gradient(135deg, #fff8ec 0%, #f5f0e8 50%, #eee8f5 100%);
+            color: #352b3d;
+        }
+        .hero{
+            padding: 3.5rem 2rem 3.25rem;
+            background: linear-gradient(120deg, #12343b 0%, #1f5c5b 55%, #c7835b 100%);
+            box-shadow: 0 16px 35px rgba(18, 52, 59, 0.28);
+        }
+        .hero:hover{
+            background: linear-gradient(120deg, #0d2930 0%, #174847 55%, #ad6d4b 100%);
+            box-shadow: 0 20px 40px rgba(18, 52, 59, 0.36);
+        }
+        .hero-icon{
+            width: 76px;
+            height: 76px;
+            border: 1px solid rgba(255, 255, 255, 0.35);
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.14);
+            box-shadow: 0 8px 18px rgba(0, 0, 0, 0.14);
+        }
+        .hero:hover .hero-icon{
+            background: rgba(255, 255, 255, 0.22);
+            transform: translateY(-4px) rotate(-6deg) scale(1.08);
+        }
+        .hero-kicker{
+            display: block;
+            margin-bottom: 0.65rem;
+            color: #f5d6b7;
+            font-size: 0.75rem;
+            font-weight: 700;
+            letter-spacing: 0.18em;
+            text-transform: uppercase;
+        }
+        .hero h1{
+            margin-bottom: 0.8rem;
+        }
+        .search-panel .form-control:hover,
+        .search-panel .form-control:focus{
+            border-color: #d4875d;
+            box-shadow: 0 0 0 3px rgba(212, 135, 93, 0.17), 0 5px 12px rgba(53, 43, 61, 0.1);
+        }
+        .search-panel .btn,
+        #backButton{
+            background: #c56b4f;
+        }
+        .search-panel .btn:hover,
+        .search-panel .btn:focus,
+        #backButton:hover,
+        #backButton:focus{
+            background: #9f4e3b;
+        }
+        .meal-card:hover,
+        .meal-card:focus{
+            box-shadow: 0 16px 28px rgba(112, 70, 111, 0.2);
+        }
+        .meal-card .card-title,
+        #detailTitle,
+        #videoSection h4,
+        #mealDetails h4{
+            color: #60375f;
+        }
+        #message{
+            color: #9f4e3b;
+        }
+        .creator-badge{
+            background: #60375f;
+            box-shadow: 0 6px 16px rgba(96, 55, 95, 0.3);
+        }
+        .creator-badge:hover,
+        .creator-badge:focus{
+            background: #c56b4f;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 16px rgba(96, 55, 95, 0.3);
+        }
+        .creator-logo{
+            background: #fff3e3;
+            color: #60375f;
+        }
+        .creator-badge:hover .creator-logo,
+        .creator-badge:focus .creator-logo{
+            color: #9f4e3b;
+        }
+        .creator-profile{
+            padding: clamp(1.5rem, 5vw, 4rem);
+            border-radius: 24px;
+            background: linear-gradient(145deg, #fffdf8, #f3eaf1);
+            box-shadow: 0 16px 36px rgba(96, 55, 95, 0.16);
+            text-align: center;
+        }
+        .profile-avatar{
+            display: block;
+            width: 140px;
+            height: 140px;
+            margin: 0 auto 1.25rem;
+            border: 8px solid #fff;
+            border-radius: 50%;
+            background: #ead9e5;
+            object-fit: cover;
+            object-position: center;
+            box-shadow: 0 10px 24px rgba(96, 55, 95, 0.2);
+        }
+        .creator-profile h2{
+            color: #60375f;
+            font-weight: 700;
+        }
+        .creator-profile p{
+            max-width: 620px;
+            margin: 0 auto 1.5rem;
+            color: #65596a;
+            line-height: 1.8;
+        }
+        .creator-profile .btn-primary{
+            border: 0;
+            border-radius: 10px;
+            background: #c56b4f;
+        }
+        .creator-profile .btn-primary:hover,
+        .creator-profile .btn-primary:focus{
+            background: #9f4e3b;
+        }
+        @media (max-width: 576px){
+            .page-container{
+                padding-left: 12px;
+                padding-right: 12px;
+            }
+            .hero{
+                padding: 2.5rem 1.25rem;
+                border-radius: 18px;
+            }
+            .search-panel{
+                margin-top: -1rem;
+            }
+            .video-preview{
+                height: 230px;
+            }
+            .creator-footer{
+                right: 12px;
+                bottom: 12px;
+            }
+            .creator-badge{
+                width: 42px;
+                height: 42px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container page-container mt-4">
+        <div class="hero text-center" id="searchHeader">
+            <div class="hero-content">
+                <div class="hero-icon" aria-hidden="true">🍽️</div>
+                <span class="hero-kicker">Fresh ideas for every table</span>
+                <h1>Discover your next favourite meal</h1>
+                <p>Search delicious recipes, explore ingredients, and cook something wonderful.</p>
+            </div>
+        </div>
+        <div class="row search-panel" id="searchControls">
+            <div class="col-md-9 mb-2">
+                <input
+                type="text" id="mealName" class="form-control" placeholder="Enter meal name,e.g paneer"/>
+            
+            </div>
+            <div class="col-md-3 mb-2">
+                <button class="btn btn-primary btn-block" onclick="searchMeals()">
+                    Search
+                </button>
+            </div>
+            <div class="col-12">
+                <select id="areaName" class="form-control" onchange="browseByArea()"
+                    aria-label="Browse recipes by cuisine">
+                    <option value="">Browse all cuisines</option>
+                    <option value="Indian">Indian dishes</option>
+                    <option value="American">American dishes</option>
+                    <option value="British">British dishes</option>
+                    <option value="Chinese">Chinese dishes</option>
+                    <option value="French">French dishes</option>
+                    <option value="Greek">Greek dishes</option>
+                    <option value="Italian">Italian dishes</option>
+                    <option value="Japanese">Japanese dishes</option>
+                    <option value="Canadian">Canadian dishes</option>
+                    <option value="Croatian">Croatian dishes</option>
+                    <option value="Dutch">Dutch dishes</option>
+                    <option value="Egyptian">Egyptian dishes</option>
+                    <option value="Mexican">Mexican dishes</option>
+                    <option value="Irish">Irish dishes</option>
+                    <option value="Jamaican">Jamaican dishes</option>
+                    <option value="Kenyan">Kenyan dishes</option>
+                    <option value="Malaysian">Malaysian dishes</option>
+                    <option value="Moroccan">Moroccan dishes</option>
+                    <option value="Polish">Polish dishes</option>
+                    <option value="Portuguese">Portuguese dishes</option>
+                    <option value="Russian">Russian dishes</option>
+                    <option value="Spanish">Spanish dishes</option>
+                    <option value="Thai">Thai dishes</option>
+                    <option value="Turkish">Turkish dishes</option>
+                    <option value="Tunisian">Tunisian dishes</option>
+                    <option value="Ukrainian">Ukrainian dishes</option>
+                    <option value="Vietnamese">Vietnamese dishes</option>
+                </select>
+            </div>
+        </div>
+        <div class="text-center mb-3" id="message"></div>
+        <div class="row" id="mealContainer"></div>
+        <section id="mealDetails" class="card mb-4" hidden>
+            <div class="card-body">
+                <button type="button" class="btn btn-secondary mb-3" id="backButton">
+                    &larr; Back to meals
+                </button>
+                <h2 id="detailTitle"></h2>
+                <p id="detailMeta" class="text-muted"></p>
+                <img id="detailImage" class="img-fluid rounded mb-3" alt=""/>
+                <h4>Ingredients</h4>
+                <ul id="detailIngredients"></ul>
+                <h4>Full Recipe</h4>
+                <p id="detailInstructions" class="recipe-instructions"></p>
+                <div id="videoSection">
+                    <h4>Recipe Video</h4>
+                    <iframe id="videoPreview" class="video-preview" title="Recipe video"
+                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                        allowfullscreen loading="lazy"></iframe>
+                    <div id="videoFallback" class="video-fallback">
+                        <img id="videoThumbnail" alt="Recipe video thumbnail"/>
+                        <p>The embedded preview is unavailable in this browser or network.</p>
+                    </div>
+                    <a id="videoLink" class="btn btn-danger mt-3" target="_blank" rel="noopener noreferrer">
+                        Watch on YouTube
+                    </a>
+                </div>
+            </div>
+        </section>
+        <section id="creatorProfile" class="creator-profile mb-4" hidden>
+            <button type="button" class="btn btn-outline-secondary mb-4" id="profileBackButton">
+                &larr; Back to recipes
+            </button>
+            <img class="profile-avatar"
+                src="Aditya.jpg"
+                alt="Photo of Aditya"/>
+            <h2>Hi, I’m Aditya</h2>
+            <p>
+                I built this recipe explorer for fun, combining food, design,
+                and code into one enjoyable experience...
+                <br><strong>Eat well. Create freely. Keep exploring.</strong>
+            </p>
+            <a class="btn btn-primary" href="https://www.linkedin.com/in/aditya-mhatarmare0101/"
+                target="_blank" rel="noopener noreferrer">
+                Visit my LinkedIn
+            </a>
+        </section>
+        <footer class="creator-footer">
+            <a class="creator-badge" href="#creatorProfile" id="creatorButton"
+                aria-label="Open Aditya's creator profile">
+                <span class="creator-logo">A</span>
+            </a>
+        </footer>
+    </div>
+    <script>
+        var mealContainer=document.getElementById("mealContainer");
+        var mealDetails=document.getElementById("mealDetails");
+        var searchHeader=document.getElementById("searchHeader");
+        var searchControls=document.getElementById("searchControls");
+        var message=document.getElementById("message");
+        var creatorProfile=document.getElementById("creatorProfile");
+
+        function showCreatorProfile(){
+            mealContainer.hidden=true;
+            mealDetails.hidden=true;
+            searchHeader.hidden=true;
+            searchControls.hidden=true;
+            message.hidden=true;
+            creatorProfile.hidden=false;
+            window.scrollTo(0, 0);
+        }
+
+        document.getElementById("creatorButton").addEventListener("click",function(event){
+            event.preventDefault();
+            showCreatorProfile();
+        });
+
+        document.getElementById("profileBackButton").addEventListener("click",function(){
+            creatorProfile.hidden=true;
+            mealContainer.hidden=false;
+            searchHeader.hidden=false;
+            searchControls.hidden=false;
+            message.hidden=false;
+        });
+
+        function getMealType(meal){
+            var details=(meal.strMeal+" "+(meal.strCategory || "")).toLowerCase();
+            for(var i=1;i<=20;i++){
+                details+=" "+(meal["strIngredient"+i] || "").toLowerCase();
+            }
+            return /\b(chicken|mutton|lamb|beef|pork|bacon|ham|turkey|duck|fish|prawn|shrimp|squid|tuna|salmon|anchov|meat|egg|seafood)\b/.test(details)
+                ? "non-veg"
+                : "veg";
+        }
+
+        function populateMealDetails(meal){
+            document.getElementById("detailTitle").textContent=meal.strMeal;
+            document.getElementById("detailMeta").textContent=
+                "Category: "+(meal.strCategory || "N/A")+" | Cuisine: "+(meal.strArea || "N/A");
+
+            var detailImage=document.getElementById("detailImage");
+            detailImage.src=meal.strMealThumb;
+            detailImage.alt=meal.strMeal;
+            document.getElementById("detailInstructions").textContent=
+                meal.strInstructions || "Recipe instructions are not available.";
+
+            var ingredients=document.getElementById("detailIngredients");
+            ingredients.innerHTML="";
+            for(var i=1;i<=20;i++){
+                var ingredient=meal["strIngredient"+i];
+                var measure=meal["strMeasure"+i];
+                if(ingredient && ingredient.trim()){
+                    var item=document.createElement("li");
+                    item.textContent=(measure ? measure.trim()+" " : "")+ingredient.trim();
+                    ingredients.appendChild(item);
+                }
+            }
+
+            var videoSection=document.getElementById("videoSection");
+            var videoLink=document.getElementById("videoLink");
+            var videoPreview=document.getElementById("videoPreview");
+            var videoFallback=document.getElementById("videoFallback");
+            var videoThumbnail=document.getElementById("videoThumbnail");
+            var videoId=meal.strYoutube && meal.strYoutube.match(
+                /(?:youtube\.com\/watch\?v=|youtu\.be\/)([^&?/]+)/
+            );
+            if(videoId){
+                videoPreview.src="https://www.youtube-nocookie.com/embed/"+videoId[1];
+                videoLink.href=meal.strYoutube;
+                videoThumbnail.src="https://img.youtube.com/vi/"+videoId[1]+"/hqdefault.jpg";
+                videoFallback.style.display="none";
+                videoPreview.style.display="block";
+                videoSection.hidden=false;
+            }else{
+                videoPreview.removeAttribute("src");
+                videoLink.removeAttribute("href");
+                videoFallback.style.display="none";
+                videoSection.hidden=true;
+            }
+
+            videoPreview.onerror=function(){
+                videoPreview.style.display="none";
+                videoFallback.style.display="block";
+            };
+
+            mealContainer.hidden=true;
+            searchHeader.hidden=true;
+            searchControls.hidden=true;
+            message.hidden=true;
+            mealDetails.hidden=false;
+            window.scrollTo(0, 0);
+        }
+
+        function showMealDetails(meal){
+            if(meal.strInstructions){
+                populateMealDetails(meal);
+                return;
+            }
+
+            document.getElementById("detailTitle").textContent="Loading recipe...";
+            mealContainer.hidden=true;
+            searchHeader.hidden=true;
+            searchControls.hidden=true;
+            message.hidden=true;
+            mealDetails.hidden=false;
+
+            var xhr=new XMLHttpRequest();
+            xhr.open("GET","https://www.themealdb.com/api/json/v1/1/lookup.php?i="+meal.idMeal,true);
+            xhr.send();
+            xhr.onreadystatechange=function(){
+                if(xhr.readyState===4){
+                    if(xhr.status===200){
+                        var data=JSON.parse(xhr.responseText);
+                        if(data.meals && data.meals[0]){
+                            populateMealDetails(data.meals[0]);
+                        }else{
+                            document.getElementById("detailTitle").textContent="Recipe not found";
+                        }
+                    }else{
+                        document.getElementById("detailTitle").textContent="Unable to load recipe";
+                    }
+                }
+            };
+        }
+
+        function renderMeals(meals){
+            mealContainer.innerHTML="";
+            for(var i=0;i<meals.length;i++){
+                let meal=meals[i];
+                var column=document.createElement("div");
+                column.className="col-md-4 mb-4";
+
+                var card=document.createElement("div");
+                card.className="card meal-card";
+                card.tabIndex=0;
+                card.setAttribute("role","button");
+                card.setAttribute("aria-label","View recipe for "+meal.strMeal);
+
+                var image=document.createElement("img");
+                image.className="card-img-top meal-image";
+                image.src=meal.strMealThumb;
+                image.alt=meal.strMeal;
+
+                var typeBadge=document.createElement("span");
+                var mealType=getMealType(meal);
+                typeBadge.className="meal-type-badge "+mealType;
+                typeBadge.textContent=mealType==="veg" ? "VEG" : "NON-VEG";
+                typeBadge.title=mealType==="veg" ? "Vegetarian recipe" : "Non-vegetarian recipe";
+
+                var cardBody=document.createElement("div");
+                cardBody.className="card-body";
+
+                var title=document.createElement("h5");
+                title.className="card-title";
+                title.textContent=meal.strMeal;
+
+                var category=document.createElement("p");
+                category.className="card-text";
+                category.textContent="Category: "+(meal.strCategory || "See recipe details");
+
+                var area=document.createElement("p");
+                area.className="card-text";
+                area.textContent="Cuisine: "+(meal.strArea || "See recipe details");
+
+                cardBody.appendChild(title);
+                cardBody.appendChild(category);
+                cardBody.appendChild(area);
+                card.appendChild(image);
+                card.appendChild(typeBadge);
+                card.appendChild(cardBody);
+                column.appendChild(card);
+
+                card.addEventListener("click",function(){
+                    showMealDetails(meal);
+                });
+                card.addEventListener("keydown",function(event){
+                    if(event.key==="Enter" || event.key===" "){
+                        event.preventDefault();
+                        showMealDetails(meal);
+                    }
+                });
+                mealContainer.appendChild(column);
+            }
+        }
+
+        function loadMeals(url, description){
+            message.textContent="Loading "+description+"...";
+            var xhr=new XMLHttpRequest();
+            xhr.open("GET",url,true);
+            xhr.send();
+            xhr.onreadystatechange=function(){
+                if(xhr.readyState===4){
+                    if(xhr.status===200){
+                        var data=JSON.parse(xhr.responseText);
+                        if(!data.meals){
+                            message.textContent="No meals found.";
+                            return;
+                        }
+                        renderMeals(data.meals);
+                        message.textContent="Found "+data.meals.length+" "+description+".";
+                    }else{
+                        message.textContent="Unable to fetch meals. Please try again.";
+                    }
+                }
+            };
+        }
+
+        function browseByArea(){
+            var area=document.getElementById("areaName").value;
+            if(!area){
+                return;
+            }
+            mealContainer.hidden=false;
+            mealDetails.hidden=true;
+            loadMeals("https://www.themealdb.com/api/json/v1/1/filter.php?a="+encodeURIComponent(area),
+                area+" dishes");
+        }
+
+        document.getElementById("backButton").addEventListener("click",function(){
+            mealDetails.hidden=true;
+            mealContainer.hidden=false;
+            searchHeader.hidden=false;
+            searchControls.hidden=false;
+            message.hidden=false;
+        });
+
+        function searchMeals(){
+            var mealName=document.getElementById("mealName").value.trim();
+            mealContainer.innerHTML="";
+            mealContainer.hidden=false;
+            mealDetails.hidden=true;
+            searchHeader.hidden=false;
+            searchControls.hidden=false;
+            message.hidden=false;
+            if(mealName==""){
+                message.textContent="Please enter a meal name";
+                return;
+            }
+            document.getElementById("areaName").value="";
+            loadMeals("https://www.themealdb.com/api/json/v1/1/search.php?s="+encodeURIComponent(mealName),
+                "meal(s)");
+        }
+        document.getElementById("mealName").addEventListener("keydown",function(event){
+            if(event.key=="Enter"){
+                searchMeals();
+            }
+        });
+     </script>
+</body>
+</html>
